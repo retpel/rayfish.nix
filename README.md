@@ -25,6 +25,15 @@ inputs.rayfish.darwinModules.default
 services.rayfish.enable = true;
 ```
 
+For NixOS, add the flake input and module:
+
+```nix
+inputs.rayfish.url = "github:retpel/rayfish.nix";
+
+modules = [ inputs.rayfish.nixosModules.default ];
+services.rayfish.enable = true;
+```
+
 The module owns the `com.rayfish.vpn` launchd daemon and runs the immutable
 binary from the Nix store. The `ray` wrapper blocks Rayfish commands that would
 install, replace, or manipulate the service outside nix-darwin. Upgrade by
