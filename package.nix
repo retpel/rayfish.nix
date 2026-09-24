@@ -31,6 +31,7 @@ stdenvNoCC.mkDerivation rec {
 
   nativeBuildInputs = lib.optional (lib.hasSuffix "-linux" system) autoPatchelfHook;
   buildInputs = lib.optionals (lib.hasSuffix "-linux" system) [ glibc libgcc ];
+  runtimeDependencies = lib.optionals (lib.hasSuffix "-linux" system) [ libgcc ];
 
   installPhase = ''
     install -Dm755 "$src" "$out/libexec/rayfish/ray"
