@@ -1,4 +1,4 @@
-{ lib, stdenvNoCC, fetchurl, system }:
+{ lib, stdenvNoCC, fetchurl, autoPatchelfHook, glibc, system }:
 
 let
   releases = {
@@ -27,7 +27,10 @@ stdenvNoCC.mkDerivation rec {
   };
 
   dontUnpack = true;
-  dontFixup = true;
+  dontFixup = lib.hasSuffix "-darwin" system;
+
+  nativeBuildInputs = lib.optional (lib.hasSuffix "-linux" system) autoPatchelfHook;
+  buildInputs = lib.optional (lib.hasSuffix "-linux" system) glibc;
 
   installPhase = ''
     install -Dm755 "$src" "$out/libexec/rayfish/ray"
