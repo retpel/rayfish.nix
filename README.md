@@ -2,9 +2,16 @@
 
 A nix-darwin package and launchd module for [Rayfish](https://rayfish.xyz).
 
-This uses the upstream prebuilt macOS Apple Silicon release binary and does not
-compile Rayfish locally. The package is pinned to release `v0.5.0` and its
-SHA-256 checksum.
+This uses upstream prebuilt release binaries and does not compile Rayfish
+locally. Release `v0.5.0` is pinned with SHA-256 checksums for:
+
+- Apple Silicon macOS (`aarch64-darwin`)
+- ARM64 Linux (`aarch64-linux`)
+- x86_64 Linux (`x86_64-linux`)
+
+The current upstream release does not publish an Intel macOS binary, so
+`x86_64-darwin` is intentionally unsupported until Rayfish publishes one or a
+source-build package is added.
 
 ## Use as a flake input
 

@@ -1,12 +1,29 @@
-{ lib, stdenvNoCC, fetchurl }:
+{ lib, stdenvNoCC, fetchurl, system }:
 
+let
+  releases = {
+    "aarch64-darwin" = {
+      asset = "ray-macos-aarch64";
+      hash = "sha256-lOrwg3sMVRadZQAS3bHx6LGnsQhmVygVYWFwq7zcyUQ=";
+    };
+    "aarch64-linux" = {
+      asset = "ray-linux-aarch64";
+      hash = "sha256-yr2652UVRvCCGhOcSOwKqKtxEgBy4tta1QwW9elvdRY=";
+    };
+    "x86_64-linux" = {
+      asset = "ray-linux-x86_64";
+      hash = "sha256-YC8cK6UN+Ls2KGMm80GFEpBHRwyFn1VUv7GF2Lou9A8=";
+    };
+  };
+  release = releases.${system} or (throw "Rayfish has no prebuilt release for ${system}");
+in
 stdenvNoCC.mkDerivation rec {
   pname = "rayfish";
   version = "0.5.0";
 
   src = fetchurl {
-    url = "https://github.com/rayfish/rayfish/releases/download/v${version}/ray-macos-aarch64";
-    hash = "sha256-lOrwg3sMVRadZQAS3bHx6LGnsQhmVygVYWFwq7zcyUQ=";
+    url = "https://github.com/rayfish/rayfish/releases/download/v${version}/${release.asset}";
+    hash = release.hash;
   };
 
   dontUnpack = true;
@@ -24,6 +41,6 @@ stdenvNoCC.mkDerivation rec {
     homepage = "https://rayfish.xyz";
     license = lib.licenses.mpl20;
     mainProgram = "ray";
-    platforms = [ "aarch64-darwin" ];
+    platforms = [ system ];
   };
 }
