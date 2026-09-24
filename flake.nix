@@ -9,7 +9,7 @@
 
   outputs = { self, nixpkgs, nix-darwin, ... }:
     let
-      systems = [ "aarch64-darwin" "x86_64-darwin" ];
+      systems = [ "aarch64-darwin" ];
       forAllSystems = f: nixpkgs.lib.genAttrs systems (system: f nixpkgs.legacyPackages.${system});
     in {
       packages = forAllSystems (pkgs: {
