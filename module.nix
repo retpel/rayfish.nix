@@ -22,7 +22,13 @@ in {
         Label = "com.rayfish.vpn";
         ProgramArguments = [ "${cfg.package}/libexec/rayfish/ray" "daemon" ];
         RunAtLoad = true;
-        KeepAlive = true;
+        # Restart after a failed daemon exit instead of leaving the service in
+        # launchd's penalty box. SuccessfulExit = false also covers Rayfish's
+        # startup/configuration failures (for example exit 78).
+        KeepAlive = {
+          SuccessfulExit = false;
+        };
+        ThrottleInterval = 10;
         StandardOutPath = "/var/log/rayfish.log";
         StandardErrorPath = "/var/log/rayfish.log";
       };
