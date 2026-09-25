@@ -23,8 +23,7 @@ in {
         ProgramArguments = [ "${cfg.package}/libexec/rayfish/ray" "daemon" ];
         RunAtLoad = true;
         # Restart after a failed daemon exit instead of leaving the service in
-        # launchd's penalty box. SuccessfulExit = false also covers Rayfish's
-        # startup/configuration failures (for example exit 78).
+        # launchd's penalty box.
         KeepAlive = {
           SuccessfulExit = false;
         };
