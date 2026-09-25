@@ -1,6 +1,7 @@
-{ lib, stdenvNoCC, fetchurl, autoPatchelfHook, glibc, libgcc, system }:
+{ lib, stdenvNoCC, fetchurl, autoPatchelfHook, glibc, libgcc }:
 
 let
+  system = stdenvNoCC.hostPlatform.system;
   releases = {
     "aarch64-darwin" = {
       asset = "ray-macos-aarch64";
