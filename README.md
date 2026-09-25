@@ -34,6 +34,19 @@ modules = [ inputs.rayfish.nixosModules.default ];
 services.rayfish.enable = true;
 ```
 
+`services.rayfish.package` defaults to this flake's own package, so no overlay
+is needed.
+
+On macOS the module also:
+
+- writes `/etc/resolver/ray` so `.ray` names resolve through Rayfish's DNS
+  (`200::53`) instead of another VPN's local resolver
+  (`services.rayfish.resolver.enable`, default `true`)
+- installs `sudo ray-fix`, which points the Rayfish DNS and active peer routes
+  back at the Rayfish utun after Rayfish or another VPN (for example WARP)
+  replaces a utun interface or address (`services.rayfish.rayFix.enable`,
+  default `true`)
+
 The module owns the `com.rayfish.vpn` launchd daemon and runs the immutable
 binary from the Nix store. The `ray` wrapper blocks Rayfish commands that would
 install, replace, or manipulate the service outside nix-darwin. Upgrade by

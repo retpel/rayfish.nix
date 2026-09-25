@@ -1,3 +1,4 @@
+self:
 { config, lib, pkgs, ... }:
 
 let
@@ -7,8 +8,8 @@ in {
     enable = lib.mkEnableOption "Rayfish mesh VPN";
     package = lib.mkOption {
       type = lib.types.package;
-      default = pkgs.rayfish;
-      defaultText = lib.literalExpression "pkgs.rayfish";
+      default = self.packages.${pkgs.stdenv.hostPlatform.system}.default;
+      defaultText = lib.literalExpression "rayfish.packages.\${pkgs.stdenv.hostPlatform.system}.default";
       description = "Rayfish package to run.";
     };
   };

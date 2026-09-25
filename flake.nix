@@ -21,9 +21,9 @@
         default = pkgs.callPackage ./package.nix { };
       });
 
-      darwinModules.default = import ./module.nix;
+      darwinModules.default = import ./module.nix self;
       darwinModules.rayfish = self.darwinModules.default;
-      nixosModules.default = import ./nixos-module.nix;
+      nixosModules.default = import ./nixos-module.nix self;
       nixosModules.rayfish = self.nixosModules.default;
 
       overlays.default = final: prev: {
