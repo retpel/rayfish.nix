@@ -11,8 +11,7 @@ Rayfish locally. Release `v0.5.0` is pinned with SHA-256 checksums for:
 - ARM64 Linux (`aarch64-linux`)
 - x86_64 Linux (`x86_64-linux`)
 
-Upstream does not publish an Intel macOS binary, so `x86_64-darwin` is
-unsupported. On Linux the binaries are patched with `autoPatchelfHook` so they
+On Linux the binaries are patched with `autoPatchelfHook` so they
 run on NixOS.
 
 ## Usage
