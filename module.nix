@@ -20,7 +20,17 @@ in {
     launchd.daemons.rayfish = {
       serviceConfig = {
         Label = "com.rayfish.vpn";
-        ProgramArguments = [ "${cfg.package}/libexec/rayfish/ray" "daemon" ];
+        # LaunchDaemons can start before the Nix store is mounted during
+        # boot. Wait from the system shell instead of letting launchd cache a
+        # missing executable and mark the job failed.
+        ProgramArguments = [
+          "/bin/sh"
+          "-c"
+          ''
+            while [ ! -x "${cfg.package}/libexec/rayfish/ray" ]; do sleep 1; done
+            exec "${cfg.package}/libexec/rayfish/ray" daemon
+          ''
+        ];
         RunAtLoad = true;
         # Restart after a failed daemon exit instead of leaving the service in
         # launchd's penalty box.
