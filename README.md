@@ -5,7 +5,8 @@ VPN built on iroh. One `module.nix` covers both nix-darwin (launchd) and NixOS
 (systemd).
 
 The package uses upstream prebuilt release binaries and does not compile
-Rayfish locally. Release `v0.5.0` is pinned with SHA-256 checksums for:
+Rayfish locally. The pinned release (`version` in `package.nix`) has SHA-256
+checksums for:
 
 - Apple Silicon macOS (`aarch64-darwin`)
 - ARM64 Linux (`aarch64-linux`)
@@ -64,10 +65,16 @@ Both run the binary straight from the Nix store.
 ## The `ray` guard
 
 The `ray` on `PATH` is a wrapper that refuses commands that would install,
-replace, or manage the service outside Nix: `install`, `uninstall`, `start`,
-`stop`, `restart`, `auto-update`, `update` (except `--check`/`--list`), and
-`sudo ray up`. Everything else passes through to the real binary at
-`libexec/rayfish/ray`.
+replace, or install the service outside Nix: `install`, `uninstall`,
+`auto-update`, `update` (except `--check`/`--list`), and `sudo ray up`.
+
+`sudo ray stop`, `sudo ray start` and `sudo ray restart` act on the
+Nix-managed service instead: on macOS they unload, load or kickstart the
+`com.rayfish.vpn` launchd job, and on Linux they call `systemctl` on
+`rayfish.service`. On macOS a stopped daemon stays stopped until `ray start`
+or the next boot.
+
+Everything else passes through to the real binary at `libexec/rayfish/ray`.
 
 Upgrade by updating the flake input (`nix flake update rayfish`), not with
 `ray update`.
