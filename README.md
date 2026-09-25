@@ -76,6 +76,15 @@ If you previously ran `sudo ray up`, remove the service it installed before
 switching (on macOS, `sudo rm /Library/LaunchDaemons/com.rayfish.vpn.plist`),
 since `ray uninstall` is blocked.
 
+## Updates
+
+A daily GitHub Actions workflow (`.github/workflows/update.yml`) checks the
+latest upstream release. When there is a new one, it updates `version` and the
+hashes in `package.nix`, builds the Linux package, runs `nix flake check`, and
+commits to `main`. It can also be run by hand from the Actions tab.
+
+Consumers still pick it up with `nix flake update rayfish`.
+
 ## Outputs
 
 - `packages.<system>.{rayfish,default}`
