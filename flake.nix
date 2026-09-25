@@ -23,7 +23,7 @@
 
       darwinModules.default = import ./module.nix self;
       darwinModules.rayfish = self.darwinModules.default;
-      nixosModules.default = import ./nixos-module.nix self;
+      nixosModules.default = import ./module.nix self;
       nixosModules.rayfish = self.nixosModules.default;
 
       overlays.default = final: prev: {

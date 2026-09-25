@@ -1,9 +1,12 @@
 self:
-{ config, lib, pkgs, ... }:
+{ config, options, lib, pkgs, ... }:
 
+# One module for both nix-darwin (launchd) and NixOS (systemd). The platform is
+# detected from the declared options rather than `pkgs`, which would recurse.
 with lib;
 let
   cfg = config.services.rayfish;
+  isDarwin = options ? launchd;
 
   # `sudo ray-fix`: point the Rayfish DNS (200::53) and active peer routes back at
   # the Rayfish utun, after Rayfish or another VPN (e.g. WARP) replaces a utun
@@ -60,6 +63,7 @@ in {
       description = ''
         Send `.ray` DNS queries to Rayfish's resolver (200::53) through
         /etc/resolver/ray, so they don't go to another VPN's local resolver.
+        macOS only.
       '';
     };
     rayFix.enable = mkOption {
@@ -68,46 +72,65 @@ in {
       description = ''
         Install `ray-fix`, a sudo command that points the Rayfish DNS and
         active peer routes back at the Rayfish utun after another VPN
-        replaces a utun interface or address.
+        replaces a utun interface or address. macOS only.
       '';
     };
   };
 
-  config = mkIf cfg.enable {
-    environment.systemPackages = [ cfg.package ] ++ optional cfg.rayFix.enable rayFix;
+  config = mkIf cfg.enable (mkMerge [
+    { environment.systemPackages = [ cfg.package ]; }
 
-    environment.etc."resolver/ray" = mkIf cfg.resolver.enable {
-      text = ''
-        nameserver 200::53
-        timeout 1
-        attempts 2
-      '';
-    };
+    (optionalAttrs isDarwin {
+      environment.systemPackages = optional cfg.rayFix.enable rayFix;
 
-    launchd.daemons.rayfish = {
-      serviceConfig = {
-        Label = "com.rayfish.vpn";
-        # LaunchDaemons can start before the Nix store is mounted during
-        # boot. Wait from the system shell instead of letting launchd cache a
-        # missing executable and mark the job failed.
-        ProgramArguments = [
-          "/bin/sh"
-          "-c"
-          ''
-            while [ ! -x "${cfg.package}/libexec/rayfish/ray" ]; do sleep 1; done
-            exec "${cfg.package}/libexec/rayfish/ray" daemon
-          ''
-        ];
-        RunAtLoad = true;
-        # Restart after a failed daemon exit instead of leaving the service in
-        # launchd's penalty box.
-        KeepAlive = {
-          SuccessfulExit = false;
-        };
-        ThrottleInterval = 10;
-        StandardOutPath = "/var/log/rayfish.log";
-        StandardErrorPath = "/var/log/rayfish.log";
+      environment.etc."resolver/ray" = mkIf cfg.resolver.enable {
+        text = ''
+          nameserver 200::53
+          timeout 1
+          attempts 2
+        '';
       };
-    };
-  };
+
+      launchd.daemons.rayfish = {
+        serviceConfig = {
+          Label = "com.rayfish.vpn";
+          # LaunchDaemons can start before the Nix store is mounted during
+          # boot. Wait from the system shell instead of letting launchd cache a
+          # missing executable and mark the job failed.
+          ProgramArguments = [
+            "/bin/sh"
+            "-c"
+            ''
+              while [ ! -x "${cfg.package}/libexec/rayfish/ray" ]; do sleep 1; done
+              exec "${cfg.package}/libexec/rayfish/ray" daemon
+            ''
+          ];
+          RunAtLoad = true;
+          # Restart after a failed daemon exit instead of leaving the service in
+          # launchd's penalty box.
+          KeepAlive = {
+            SuccessfulExit = false;
+          };
+          ThrottleInterval = 10;
+          StandardOutPath = "/var/log/rayfish.log";
+          StandardErrorPath = "/var/log/rayfish.log";
+        };
+      };
+    })
+
+    (optionalAttrs (!isDarwin) {
+      systemd.services.rayfish = {
+        description = "Rayfish mesh VPN daemon";
+        wantedBy = [ "multi-user.target" ];
+        wants = [ "network-online.target" ];
+        after = [ "network-online.target" ];
+        serviceConfig = {
+          ExecStart = "${cfg.package}/libexec/rayfish/ray daemon";
+          Restart = "on-failure";
+          RestartSec = 5;
+          User = "root";
+        };
+      };
+    })
+  ]);
 }

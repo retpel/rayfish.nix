@@ -18,12 +18,12 @@ case "$subcommand" in
     esac
     ;;
   auto-update|install|uninstall|start|stop|restart)
-    echo "rayfish: service management is owned by nix-darwin" >&2
+    echo "rayfish: service management is owned by the Nix module" >&2
     exit 1
     ;;
   up)
     if [ "$(id -u)" = 0 ]; then
-      echo "rayfish: root service setup is owned by nix-darwin" >&2
+      echo "rayfish: root service setup is owned by the Nix module" >&2
       exit 1
     fi
     ;;
