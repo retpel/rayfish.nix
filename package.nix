@@ -5,22 +5,22 @@ let
   releases = {
     "aarch64-darwin" = {
       asset = "ray-macos-aarch64";
-      hash = "sha256-cLX0XBBtRkjvsGN5M2fK9kMyCL0I0Npfplh8aLIU+fQ=";
+      hash = "sha256-Pi3f1ylhp0B8f8/9zdEuEwiObMqDHQENn3udaxvo6Gg=";
     };
     "aarch64-linux" = {
       asset = "ray-linux-aarch64";
-      hash = "sha256-3pwdqeckHq/6q8UqWBnBZ0S39dk2gjIbFJ30+2miqnM=";
+      hash = "sha256-gZE4JHO/PKuR/Zmca3fqBjJvYwSgv49JSPxZEbFsHRs=";
     };
     "x86_64-linux" = {
       asset = "ray-linux-x86_64";
-      hash = "sha256-/gsMqkKvPaGUtg4EBkGcKr7ERSUzduil4QpUf76pzpU=";
+      hash = "sha256-S4XTLCz/EX5K2m+a9KlUiSvTI2U9syK4MlypN8IJpWg=";
     };
   };
   release = releases.${system} or (throw "Rayfish has no prebuilt release for ${system}");
 in
 stdenvNoCC.mkDerivation rec {
   pname = "rayfish";
-  version = "0.5.1";
+  version = "0.5.2";
 
   src = fetchurl {
     url = "https://github.com/rayfish/rayfish/releases/download/v${version}/${release.asset}";
